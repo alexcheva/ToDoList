@@ -1,0 +1,44 @@
+
+<%- include("partials/header"); -%>
+<div id="container">
+<div class="container">
+			<form action="/" method="post">
+			<h1>Monday<%#<i class="fa fa-plus" aria-hidden="true"></i>%></h1>
+			<input type="text" name="newToDo" placeholder="Add New To-Do">
+			</form>
+			
+			<ul><% listItems.forEach(function(listItem){ %>
+			<form name="items" action="/delete" method="post">
+			<li>
+			<span><input type="checkbox" id="<%=listItem._id%>" class="checkbox" name="item" value="<%=listItem._id%>" onChange="this.form.submit()"><label for="<%=listItem._id%>" class="fa fa-trash" aria-hidden="true" ></label></span><%=listItem.name %></li>
+			
+			</form>
+			<% }); %>
+			</ul>
+</div>
+<% const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %>
+<% days.forEach(function(day){ %>
+	<div class="container">
+        <form action="/" method="post">
+			<h1 name="title"><%=day%></h1>
+			<input type="text" name="newItem" placeholder="Add New To-Do">
+			<input type="hidden" name="listName" value="<%=day%>">
+        </form>
+			
+        <ul><% listItems.forEach(function(listItem){ %>
+            <form name="items" action="/delete" method="post">
+			    <li>
+                    <span>
+			            <input type="checkbox" id="<%=listItem._id%>" class="checkbox" name="item" value="<%=listItem._id%>" onChange="this.form.submit()">
+			            <label for="<%=listItem._id%>" class="fa fa-trash" aria-hidden="true" ></label>
+			         </span><%=listItem.name %>
+			     </li>
+			    <input type="hidden" name="list" value="<%=day%>">
+			</form>
+			<% }); %>
+        </ul>
+    </div>
+<% }) %>
+</div>
+
+		<%- include("partials/footer"); -%>
