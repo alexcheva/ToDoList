@@ -59,6 +59,7 @@ app.get("/", function(req, res){
     
 	 List.find({}, function(err, results){
 	 	if(!err){
+            console.log(results)
 	 		res.render("week", {listItems: results });
 	 	}
 	 });
@@ -70,20 +71,23 @@ app.post("/", function(req, res){
     const itemName = req.body.newItem;
     
     const newItem = new Item({
-    name: itemName
+        name: itemName
     });
-    
+    newItem.save()
     List.findOne({name: listName}, function(err, foundList){
         if(!err){
             if(!foundList){
                 const list = new List({
                     name: listName,
-                    items: DefaultTasks
+                    items: [...DefaultTasks, newItem]
                 });
                 list.save();
                 res.redirect("/");
             } else {
-                res.render("week", {listItems: foundList.items})
+                foundList.items.push(newItem)
+                newItem.save()
+                foundList.save()
+                res.redirect("/");
             }
         }
     });
@@ -102,22 +106,23 @@ app.post("/", function(req, res){
 });
 
 app.post("/delete", function(req,res){
-	console.log(req.body.listName);
-	console.log(req.body.collection);
-	ToDo.deleteOne({_id: req.body.item},function(err){
-		if(!err){
-			console.log("Sucessfully removed");
-		    res.redirect("/");
-		}
-	});
-    if( req.body.listName === "Monday"){
-        Monday.deleteOne({_id: req.body.item},function(err){
-		if(!err){
-			console.log("Sucessfully removed");
-		    res.redirect("/");
-		  }
-	       });
-	}
+    const {listName, item} = req.body
+    List.findOne({name: listName}, function(err, foundList){
+        if(!err){
+            if(!foundList){
+                res.redirect("/");
+            } else {
+                foundList.items.forEach((x, idx) => {
+                    console.log(x._id == item)
+                    if ( x._id == item ) {
+                        foundList.items.remove(x)
+                        foundList.save()
+                    }
+                })
+            }
+            res.redirect("/");                        
+        }
+    });
 
 });
 
